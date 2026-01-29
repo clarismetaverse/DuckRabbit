@@ -35,11 +35,13 @@ export type Entity =
   | { kind: "Triangle"; data: Triangle };
 
 export interface EntityRef {
+  kind: "EntityRef";
   spaceId: string;
   entityId: string;
 }
 
 export interface RoleRef {
+  kind: "RoleRef";
   spaceId: string;
   role: string;
 }

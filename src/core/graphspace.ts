@@ -8,7 +8,9 @@ export class GraphSpace {
   }
 
   addIdentification(identification: Identification): void {
-    this.identifications.push(identification);
+    if (!this.identifications.find((item) => item.id === identification.id)) {
+      this.identifications.push(identification);
+    }
   }
 
   getIdentifications(): Identification[] {
@@ -18,31 +20,50 @@ export class GraphSpace {
   findIdentificationsByEntity(entityRef: EntityRef): Identification[] {
     return this.identifications.filter((identification) => {
       return (
-        this.isEntityRef(identification.from) &&
-        this.matchEntityRef(identification.from, entityRef)
-      ) ||
+        (this.isEntityRef(identification.from) &&
+          this.matchEntityRef(identification.from, entityRef)) ||
         (this.isEntityRef(identification.to) &&
-          this.matchEntityRef(identification.to, entityRef));
+          this.matchEntityRef(identification.to, entityRef))
+      );
     });
   }
 
   findIdentificationsByRole(roleRef: RoleRef): Identification[] {
     return this.identifications.filter((identification) => {
       return (
-        this.isRoleRef(identification.from) &&
-        this.matchRoleRef(identification.from, roleRef)
-      ) ||
+        (this.isRoleRef(identification.from) &&
+          this.matchRoleRef(identification.from, roleRef)) ||
         (this.isRoleRef(identification.to) &&
-          this.matchRoleRef(identification.to, roleRef));
+          this.matchRoleRef(identification.to, roleRef))
+      );
+    });
+  }
+
+  findIdentifications(ref: EntityRef | RoleRef): Identification[] {
+    return this.identifications.filter((identification) => {
+      return (
+        this.matchRef(identification.from, ref) ||
+        this.matchRef(identification.to, ref)
+      );
     });
   }
 
   private isEntityRef(ref: EntityRef | RoleRef): ref is EntityRef {
-    return (ref as EntityRef).entityId !== undefined;
+    return ref.kind === "EntityRef";
   }
 
   private isRoleRef(ref: EntityRef | RoleRef): ref is RoleRef {
-    return (ref as RoleRef).role !== undefined;
+    return ref.kind === "RoleRef";
+  }
+
+  private matchRef(a: EntityRef | RoleRef, b: EntityRef | RoleRef): boolean {
+    if (this.isEntityRef(a) && this.isEntityRef(b)) {
+      return this.matchEntityRef(a, b);
+    }
+    if (this.isRoleRef(a) && this.isRoleRef(b)) {
+      return this.matchRoleRef(a, b);
+    }
+    return false;
   }
 
   private matchEntityRef(a: EntityRef, b: EntityRef): boolean {
