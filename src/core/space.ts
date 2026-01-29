@@ -17,6 +17,12 @@ export class Space {
     this.roles = params.roles ?? {};
     this.metadata = params.metadata;
   }
+
+  getRolesOfEntity(entityId: string): string[] {
+    return Object.entries(this.roles)
+      .filter(([_, entities]) => entities.includes(entityId))
+      .map(([role]) => role);
+  }
 }
 
 export class BlendSpace extends Space {
